@@ -1,9 +1,19 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import userRouter from './routes/userRoutes.js';
 const app = express();
-
 dotenv.config();
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('connected to db');
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
 
 let corsOptions = {
   origin: 'http://localhost:3000',
@@ -18,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/api', function (req, res) {
   res.json({ message: 'Hello World' });
 });
-
+app.use('/api/users', userRouter);
 // const __dirname = path.resolve();
 // app.use(express.static(path.join(__dirname, '/frontend/')));
 // app.get('*', (req, res) =>

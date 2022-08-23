@@ -11,3 +11,45 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.container {
+  padding-inline: 1rem;
+}
+
+main {
+  min-height: 80vh;
+  padding-inline: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  background-color: rgb(62, 62, 102);
+  color: white;
+}
+nav {
+  display: flex;
+  padding: 1rem;
+}
+nav ul {
+  margin-left: auto;
+  list-style-type: none;
+  display: flex;
+  gap: 30px;
+}
+.nav-item {
+  text-decoration: none;
+  color: white;
+}
+footer {
+  padding: 4rem 0 2rem;
+  text-align: center;
+  background-color: rgb(62, 62, 102);
+  color: white;
+  font-size: 1.2rem;
+}
+.todo-container {
+  display: flex;
+}
+.todo-container > div {
+  flex: 1 1 100%;
+}
