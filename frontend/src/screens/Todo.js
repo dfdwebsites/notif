@@ -58,7 +58,6 @@ export default function Todo() {
           }
         }
       );
-      console.log(data);
       ctxDispatch({ type: 'USER_SING_IN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
       setTimeout(() => {

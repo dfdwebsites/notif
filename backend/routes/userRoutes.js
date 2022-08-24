@@ -32,7 +32,8 @@ userRouter.put(
         username,
         isAdmin,
         token: generateToken(userFound),
-        todos: updatedUsersTodos.todos || []
+        todos: updatedUsersTodos.todos || [],
+        expenses: [...updatedUsersTodos.expenses]
       });
     } else {
       res.status(401).send({ message: 'No user found' });
@@ -57,7 +58,89 @@ userRouter.put(
         username,
         isAdmin,
         token: generateToken(userFound),
-        todos: updatedUsersTodos.todos
+        todos: updatedUsersTodos.todos,
+        expenses: [...updatedUsersTodos.expenses]
+      });
+    } else {
+      res.status(401).send({ message: 'No user found' });
+    }
+  })
+);
+
+userRouter.put(
+  '/:id/addexpense',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const userId = req.params.id;
+    const userFound = await User.findById(userId);
+    if (userFound) {
+      let month = moment().format('MMMM');
+      let monthObj = userFound.expenses.filter((exp) => exp.month === month);
+      if (!monthObj.length) {
+        if (!req.body.expense) {
+          res.status(401).send({ message: 'something went wrong' });
+        }
+        let newObj = {
+          month: month,
+          expense: [req.body.expense],
+          income: []
+        };
+        userFound.expenses.push(newObj);
+      } else {
+        userFound.expenses
+          .filter((exp) => exp.month === month)[0]
+          .expense.push(req.body.expense);
+      }
+
+      const updatedUsersExpenses = await userFound.save();
+      const { _id, username, isAdmin } = updatedUsersExpenses;
+      res.send({
+        _id,
+        username,
+        isAdmin,
+        token: generateToken(userFound),
+        todos: updatedUsersExpenses.todos,
+        expenses: [...updatedUsersExpenses.expenses]
+      });
+    } else {
+      res.status(401).send({ message: 'No user found' });
+    }
+  })
+);
+
+userRouter.put(
+  '/:id/addincome',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const userId = req.params.id;
+    const userFound = await User.findById(userId);
+    if (userFound) {
+      let month = moment().format('MMMM');
+      let monthObj = userFound.expenses.filter((exp) => exp.month === month);
+      if (!monthObj.length) {
+        if (!req.body.income) {
+          res.status(401).send({ message: 'something went wrong' });
+        }
+        let newObj = {
+          month: month,
+          expense: [],
+          income: [req.body.income]
+        };
+        userFound.expenses.push(newObj);
+      }
+      userFound.expenses
+        .filter((exp) => exp.month === month)[0]
+        .income.push(req.body.income);
+
+      const updatedUsersExpenses = await userFound.save();
+      const { _id, username, isAdmin } = updatedUsersExpenses;
+      res.send({
+        _id,
+        username,
+        isAdmin,
+        token: generateToken(userFound),
+        todos: updatedUsersExpenses.todos,
+        expenses: [...updatedUsersExpenses.expenses]
       });
     } else {
       res.status(401).send({ message: 'No user found' });
@@ -73,11 +156,19 @@ userRouter.post(
       password: bcrypt.hashSync(req.body.password)
     });
     const user = await newUser.save();
+    let month = moment().format('MMMM');
+    let expnseObj = {
+      month: month,
+      expense: [],
+      income: []
+    };
     res.send({
       _id: user._id,
       username: user.username,
       isAdmin: user.isAdmin,
-      token: generateToken(user)
+      token: generateToken(user),
+      expenses: [expnseObj],
+      todos: []
     });
   })
 );
@@ -93,7 +184,8 @@ userRouter.post(
           username,
           isAdmin,
           token: generateToken(userFound),
-          todos: userFound.todos || []
+          todos: userFound.todos || [],
+          expenses: userFound.expenses || []
         });
         return;
       }

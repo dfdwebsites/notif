@@ -14,6 +14,13 @@ const userModel = new mongoose.Schema(
         time: { type: String, default: moment().format('LT') },
         createdAt: { type: Date, default: Date.now() }
       }
+    ],
+    expenses: [
+      {
+        month: { type: String },
+        income: [Number],
+        expense: [Number]
+      }
     ]
   },
   { timestamps: true }
