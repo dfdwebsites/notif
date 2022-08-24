@@ -2,7 +2,8 @@ import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import User from '../Models/userModel.js';
-import { generateToken, isAuth } from '../utils.js';
+import { formatTime, generateToken, isAuth } from '../utils.js';
+import moment from 'moment';
 
 const userRouter = express.Router();
 
@@ -13,7 +14,17 @@ userRouter.put(
     const userId = req.params.id;
     const userFound = await User.findById(userId);
     if (userFound) {
-      userFound.todos.push({ todo: req.body.todo, todoId: req.body.todoId });
+      const todoObj = {};
+      const { todo, todoId, date, time } = req.body;
+      todoObj.todo = todo;
+      todoObj.todoId = todoId;
+      if (date) {
+        todoObj.date = moment(date).format('MMMM Do YYYY');
+      }
+      if (time) {
+        todoObj.time = formatTime(time);
+      }
+      userFound.todos.push(todoObj);
       const updatedUsersTodos = await userFound.save();
       const { _id, username, isAdmin } = updatedUsersTodos;
       res.send({

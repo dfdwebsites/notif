@@ -38,3 +38,21 @@ export const isAdmin = (req, res, next) => {
     res.status(401).send({ message: 'Invalid Admin Token' });
   }
 };
+
+export const formatTime = (time) => {
+  let timeAr = time.split(':');
+  let hours = timeAr[0];
+  let min = timeAr[1];
+  let pmam = '';
+  if (hours >= 12) {
+    if (hours == 12) {
+      pmam = 'PM';
+    } else {
+      hours -= 12;
+      pmam = 'PM';
+    }
+  } else {
+    pmam = 'AM';
+  }
+  return `${hours}:${min} ${pmam}`;
+};

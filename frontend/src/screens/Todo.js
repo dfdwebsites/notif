@@ -1,25 +1,28 @@
 import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Store } from '../Store';
 import { getRandomId } from '../utils';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+import moment from 'moment';
 
 export default function Todo() {
   const navigate = useNavigate();
-  const [date, setDate] = useState(new Date());
+  const todoInputRef = useRef(null);
+  const todoDateRef = useRef(null);
+  const todoTimeRef = useRef(null);
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
   const [newTodo, setNewTodo] = useState('');
-  console.log(date);
+  const [todoDate, setTodoDate] = useState('');
+  const [todoTime, setTodoTime] = useState('');
+
   useEffect(() => {
     if (!userInfo) {
       navigate('/');
     }
   }, [navigate, userInfo]);
 
-  const handleTodo = async (todo) => {
+  const deleteTodo = async (todo) => {
     try {
       const { data } = await axios.put(
         `${process.env.REACT_APP_SERVER_URL}/api/users/${userInfo._id}/removetodo`,
@@ -45,6 +48,8 @@ export default function Todo() {
         `${process.env.REACT_APP_SERVER_URL}/api/users/${userInfo._id}/todos`,
         {
           todo: newTodo,
+          date: todoDate,
+          time: todoTime,
           todoId: getRandomId(20)
         },
         {
@@ -53,10 +58,16 @@ export default function Todo() {
           }
         }
       );
+      console.log(data);
       ctxDispatch({ type: 'USER_SING_IN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
       setTimeout(() => {
+        todoInputRef.current.value = '';
+        todoDateRef.current.value = '';
+        todoTimeRef.current.value = '';
         setNewTodo('');
+        setTodoDate('');
+        setTodoTime('');
       }, 0);
     } catch (err) {
       console.log(err);
@@ -72,7 +83,7 @@ export default function Todo() {
             userInfo.todos.map((todo, i) => (
               <div key={i}>
                 {todo.todo}
-                <button onClick={() => handleTodo(todo)}>remove</button>
+                <button onClick={() => deleteTodo(todo)}>remove</button>
               </div>
             ))
           ) : (
@@ -80,12 +91,21 @@ export default function Todo() {
           )}
         </div>
         <div>
-          <Calendar onChange={setDate} value={date} />
           <form onSubmit={handleSubmit}>
+            <input
+              type="date"
+              ref={todoDateRef}
+              onChange={(e) => setTodoDate(e.target.value)}
+            />
+            <input
+              type="time"
+              ref={todoTimeRef}
+              onChange={(e) => setTodoTime(e.target.value)}
+            />
             <input
               type="text"
               placeholder="what to do"
-              value={newTodo}
+              ref={todoInputRef}
               onChange={(e) => setNewTodo(e.target.value)}
             />
             <button>Create todo</button>

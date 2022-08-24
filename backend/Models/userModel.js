@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 const userModel = new mongoose.Schema(
   {
@@ -9,6 +10,8 @@ const userModel = new mongoose.Schema(
       {
         todo: { type: String, required: true },
         todoId: { type: String, required: true },
+        date: { type: String, default: moment().format('MMMM Do YYYY') },
+        time: { type: String, default: moment().format('LT') },
         createdAt: { type: Date, default: Date.now() }
       }
     ]
