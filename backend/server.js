@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import userRouter from './routes/userRoutes.js';
+import notficationRouter from './routes/notificationRoutes.js';
 const app = express();
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.get('/api', function (req, res) {
   res.json({ message: 'Hello World' });
 });
 app.use('/api/users', userRouter);
+app.use('/api/notifications', notficationRouter);
 // const __dirname = path.resolve();
 // app.use(express.static(path.join(__dirname, '/frontend/')));
 // app.get('*', (req, res) =>

@@ -127,10 +127,11 @@ userRouter.put(
           income: [req.body.income]
         };
         userFound.expenses.push(newObj);
+      } else {
+        userFound.expenses
+          .filter((exp) => exp.month === month)[0]
+          .income.push(req.body.income);
       }
-      userFound.expenses
-        .filter((exp) => exp.month === month)[0]
-        .income.push(req.body.income);
 
       const updatedUsersExpenses = await userFound.save();
       const { _id, username, isAdmin } = updatedUsersExpenses;

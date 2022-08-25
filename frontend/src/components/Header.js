@@ -49,6 +49,11 @@ export default function Header() {
                 </Link>
               </li>
               <li>
+                <Link className="nav-item" to="/friends">
+                  Friends
+                </Link>
+              </li>
+              <li>
                 <Link className="nav-item" to="/profile">
                   {userInfo.username}
                 </Link>

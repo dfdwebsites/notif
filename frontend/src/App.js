@@ -3,6 +3,7 @@ import Footer from './components/Footer';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import Expenses from './screens/Expenses';
+import FriendsScreen from './screens/FriendsScreen';
 import Homescreen from './screens/Homescreen';
 import LoginScreen from './screens/LoginScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -39,6 +40,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Expenses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <FriendsScreen />
               </ProtectedRoute>
             }
           />

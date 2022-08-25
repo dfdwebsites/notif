@@ -3,7 +3,7 @@ import moment from 'moment';
 
 const userModel = new mongoose.Schema(
   {
-    username: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     todos: [
@@ -18,8 +18,8 @@ const userModel = new mongoose.Schema(
     expenses: [
       {
         month: { type: String },
-        income: [Number],
-        expense: [Number]
+        income: [{ value: Number, lablel: String }],
+        expense: [{ value: Number, label: String }]
       }
     ]
   },
