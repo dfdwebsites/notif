@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import expressAsyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import User from '../Models/userModel.js';
@@ -133,6 +134,105 @@ userRouter.put(
           .income.push(req.body.income);
       }
 
+      const updatedUsersExpenses = await userFound.save();
+      const { _id, username, isAdmin } = updatedUsersExpenses;
+      res.send({
+        _id,
+        username,
+        isAdmin,
+        token: generateToken(userFound),
+        todos: updatedUsersExpenses.todos,
+        expenses: [...updatedUsersExpenses.expenses]
+      });
+    } else {
+      res.status(401).send({ message: 'No user found' });
+    }
+  })
+);
+
+userRouter.put(
+  '/:id/incomelabel',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const userId = req.params.id;
+    let arrayOfLabels = req.body.arrayOfLabels;
+    let label = req.body.label;
+    let month = moment().format('MMMM');
+    const userFound = await User.findById(userId);
+    if (userFound) {
+      let incomeArray = [
+        ...userFound.expenses.filter((exp) => exp.month === month)[0].income
+      ];
+      let restArray = [];
+      let filtered = [];
+      incomeArray.map((inc) => {
+        if (
+          arrayOfLabels.some(
+            (v) => JSON.stringify(v) === JSON.stringify(inc._id)
+          )
+        ) {
+          filtered.push(inc);
+        } else {
+          restArray.push(inc);
+        }
+      });
+      let createdObj = {
+        label: label,
+        value: filtered.reduce((a, c) => a + c.value, 0)
+      };
+      userFound.expenses.filter((exp) => exp.month === month)[0].income = [
+        createdObj,
+        ...restArray
+      ];
+      const updatedUsersExpenses = await userFound.save();
+      const { _id, username, isAdmin } = updatedUsersExpenses;
+      res.send({
+        _id,
+        username,
+        isAdmin,
+        token: generateToken(userFound),
+        todos: updatedUsersExpenses.todos,
+        expenses: [...updatedUsersExpenses.expenses]
+      });
+    } else {
+      res.status(401).send({ message: 'No user found' });
+    }
+  })
+);
+userRouter.put(
+  '/:id/expenselabel',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const userId = req.params.id;
+    let arrayOfLabels = req.body.arrayOfLabels;
+    let label = req.body.label;
+    let month = moment().format('MMMM');
+    const userFound = await User.findById(userId);
+    if (userFound) {
+      let incomeArray = [
+        ...userFound.expenses.filter((exp) => exp.month === month)[0].expense
+      ];
+      let restArray = [];
+      let filtered = [];
+      incomeArray.map((inc) => {
+        if (
+          arrayOfLabels.some(
+            (v) => JSON.stringify(v) === JSON.stringify(inc._id)
+          )
+        ) {
+          filtered.push(inc);
+        } else {
+          restArray.push(inc);
+        }
+      });
+      let createdObj = {
+        label: label,
+        value: filtered.reduce((a, c) => a + c.value, 0)
+      };
+      userFound.expenses.filter((exp) => exp.month === month)[0].expense = [
+        createdObj,
+        ...restArray
+      ];
       const updatedUsersExpenses = await userFound.save();
       const { _id, username, isAdmin } = updatedUsersExpenses;
       res.send({

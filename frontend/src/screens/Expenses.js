@@ -2,12 +2,15 @@ import axios from 'axios';
 import moment from 'moment';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import CheckboxComponent from '../components/CheckboxComponent';
+import ListComponent from '../components/ListComponent';
 import { Store } from '../Store';
 
 export default function Expenses() {
   const expenseRef = useRef(null);
   const incomeRef = useRef(null);
   const [editIncomes, setEditIncomes] = useState(false);
+  const [editExpenses, setEditExpenses] = useState(false);
   const [expense, setExpense] = useState(null);
   const [income, setIncome] = useState(null);
   const navigate = useNavigate();
@@ -20,12 +23,11 @@ export default function Expenses() {
     }
   }, [userInfo, navigate]);
 
-  const addExpenseHandler = async (e) => {
-    e.preventDefault();
+  const addExpenseHandler = async (value) => {
     try {
       const { data } = await axios.put(
         `${process.env.REACT_APP_SERVER_URL}/api/users/${userInfo._id}/addexpense`,
-        { expense: { value: expense } },
+        { expense: { value: value, label: '' } },
         {
           headers: {
             authorization: `Bearer ${userInfo.token}`
@@ -45,7 +47,7 @@ export default function Expenses() {
     try {
       const { data } = await axios.put(
         `${process.env.REACT_APP_SERVER_URL}/api/users/${userInfo._id}/addincome`,
-        { income: { value } },
+        { income: { value, label: '' } },
         {
           headers: {
             authorization: `Bearer ${userInfo.token}`
@@ -64,16 +66,56 @@ export default function Expenses() {
     e.preventDefault();
     addIncomeHandler(income);
   };
+  const addExpenseHandlerSubmit = (e) => {
+    e.preventDefault();
+    addExpenseHandler(expense);
+  };
 
-  const createLabel = (e) => {
+  const createLabel = async (e) => {
     e.preventDefault();
     let array = [...e.target];
-    // console.log(e);
-    // console.log(array.filter((elem) => elem.checked).map((el) => el.value));
     let selectedArray = array
       .filter((elem) => elem.checked)
       .map((el) => el.value);
-    console.log(selectedArray);
+
+    try {
+      let label = window.prompt('What is the name of the label');
+      const { data } = await axios.put(
+        `${process.env.REACT_APP_SERVER_URL}/api/users/${userInfo._id}/incomelabel`,
+        { arrayOfLabels: selectedArray, label: label },
+        { headers: { authorization: `Bearer ${userInfo.token}` } }
+      );
+      console.log(data);
+      ctxDispatch({ type: 'USER_SING_IN', payload: data });
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      setEditIncomes(false);
+    } catch (err) {
+      console.log(err);
+    }
+    // e.target.filter(elements=>elements.checked)
+  };
+
+  const createLabelForExpenses = async (e) => {
+    e.preventDefault();
+    let array = [...e.target];
+    let selectedArray = array
+      .filter((elem) => elem.checked)
+      .map((el) => el.value);
+
+    try {
+      let label = window.prompt('What is the name of the label');
+      const { data } = await axios.put(
+        `${process.env.REACT_APP_SERVER_URL}/api/users/${userInfo._id}/expenselabel`,
+        { arrayOfLabels: selectedArray, label: label },
+        { headers: { authorization: `Bearer ${userInfo.token}` } }
+      );
+      console.log(data);
+      ctxDispatch({ type: 'USER_SING_IN', payload: data });
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      setEditExpenses(false);
+    } catch (err) {
+      console.log(err);
+    }
     // e.target.filter(elements=>elements.checked)
   };
 
@@ -96,7 +138,13 @@ export default function Expenses() {
         <div>
           expenses
           <div>
-            <form onSubmit={addExpenseHandler}>
+            <div>
+              <button onClick={() => addExpenseHandler(5)}>+5</button>
+              <button onClick={() => addExpenseHandler(10)}>+10</button>
+              <button onClick={() => addExpenseHandler(15)}>+15</button>
+              <button onClick={() => addExpenseHandler(20)}>+20</button>
+            </div>
+            <form onSubmit={addExpenseHandlerSubmit}>
               <input
                 type="number"
                 ref={expenseRef}
@@ -108,19 +156,31 @@ export default function Expenses() {
             </form>
           </div>
           <div>List of Expenses for {thisMonth}</div>
-          {userInfo.expenses &&
-            userInfo.expenses.length &&
-            userInfo.expenses
-              .filter((ex) => ex.month === thisMonth)[0]
-              .expense.map((expe, i) => <li key={i}> {expe.value}€ </li>)}
-          {userInfo.expenses && userInfo.expenses.length && (
-            <li>
-              Total Expenses:{' '}
-              {userInfo.expenses
-                .filter((ex) => ex.month === thisMonth)[0]
-                .expense.reduce((a, c) => a + c.value, 0)}
-              €
-            </li>
+          <button onClick={() => setEditExpenses((prev) => !prev)}>
+            Edit mode
+          </button>
+          {editExpenses ? (
+            <>
+              <form onSubmit={createLabelForExpenses}>
+                <button>create Label</button>
+                {userInfo.expenses && userInfo.expenses.length && (
+                  <CheckboxComponent
+                    expenses={userInfo.expenses}
+                    thisMonth={thisMonth}
+                    forWhat="Expenses"
+                  />
+                )}
+              </form>
+            </>
+          ) : (
+            userInfo.expenses &&
+            userInfo.expenses.length && (
+              <ListComponent
+                expenses={userInfo.expenses}
+                thisMonth={thisMonth}
+                forWhat="Expenses"
+              />
+            )
           )}
         </div>
         <div>
@@ -151,36 +211,24 @@ export default function Expenses() {
             <>
               <form onSubmit={createLabel}>
                 <button>create Label</button>
-                {userInfo.expenses &&
-                  userInfo.expenses.length &&
-                  userInfo.expenses
-                    .filter((ex) => ex.month === thisMonth)[0]
-                    .income.map((expe, i) => (
-                      <label key={i}>
-                        {' '}
-                        {expe.value}
-                        <input type="checkbox" value={expe._id} />
-                      </label>
-                    ))}
+                {userInfo.expenses && userInfo.expenses.length && (
+                  <CheckboxComponent
+                    expenses={userInfo.expenses}
+                    thisMonth={thisMonth}
+                    forWhat="Income"
+                  />
+                )}
               </form>
             </>
           ) : (
-            <>
-              {userInfo.expenses &&
-                userInfo.expenses.length &&
-                userInfo.expenses
-                  .filter((ex) => ex.month === thisMonth)[0]
-                  .income.map((expe, i) => <li key={i}> {expe.value}€ </li>)}
-              {userInfo.expenses && userInfo.expenses.length && (
-                <li>
-                  Total Income:{' '}
-                  {userInfo.expenses
-                    .filter((ex) => ex.month === thisMonth)[0]
-                    .income.reduce((a, c) => a + c.value, 0)}
-                  €
-                </li>
-              )}
-            </>
+            userInfo.expenses &&
+            userInfo.expenses.length && (
+              <ListComponent
+                expenses={userInfo.expenses}
+                thisMonth={thisMonth}
+                forWhat="Income"
+              />
+            )
           )}
         </div>
       </div>

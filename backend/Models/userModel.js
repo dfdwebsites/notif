@@ -18,7 +18,7 @@ const userModel = new mongoose.Schema(
     expenses: [
       {
         month: { type: String },
-        income: [{ value: Number, lablel: String }],
+        income: [{ value: Number, label: String }],
         expense: [{ value: Number, label: String }]
       }
     ]
