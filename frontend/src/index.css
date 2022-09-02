@@ -58,21 +58,7 @@ footer {
   flex: 1 1 100%;
   padding-inline: 3rem;
 }
-.expenses-div {
-  border: 1px solid red;
-}
-.income-div {
-  border: 1px solid green;
-}
-.expenses-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.expenses-container > div {
-  flex: 1 1 450px;
-  padding: 1.5rem 3rem;
-}
+
 button {
   cursor: pointer;
 }
@@ -111,6 +97,34 @@ button {
   align-self: flex-end;
 }
 /* Expenses */
+.expenses-div {
+  border: 1px solid red;
+}
+.income-div {
+  border: 1px solid green;
+}
+.expenses-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.expenses-container > div {
+  flex: 1 1 100%;
+  padding: 1.5rem 3rem;
+}
+.expenses-div {
+  background-color: rgb(255, 235, 238);
+  order: 1;
+}
+.income-div {
+  background-color: #f5fff5;
+  order: 2;
+}
+@media (max-width: 840px) {
+  .expenses-container {
+    flex-direction: column;
+  }
+}
 .expenses-page-title {
   max-width: 800px;
   display: flex;
@@ -172,4 +186,18 @@ button {
   margin-top: 1rem;
   display: flex;
   flex-direction: column;
+}
+.label-form button {
+  align-self: center;
+}
+
+.check-item {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+.myinput {
+  height: 22px;
+  width: 22px;
+  cursor: pointer;
+  margin-left: 0.5rem;
 }

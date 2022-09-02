@@ -85,7 +85,6 @@ export default function Expenses() {
         { arrayOfLabels: selectedArray, label: label },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
       );
-      console.log(data);
       ctxDispatch({ type: 'USER_SING_IN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
       setEditIncomes(false);
@@ -101,7 +100,9 @@ export default function Expenses() {
     let selectedArray = array
       .filter((elem) => elem.checked)
       .map((el) => el.value);
-
+    if (selectedArray.length === 0) {
+      return;
+    }
     try {
       let label = window.prompt('What is the name of the label');
       const { data } = await axios.put(
@@ -118,15 +119,12 @@ export default function Expenses() {
     }
     // e.target.filter(elements=>elements.checked)
   };
+
   const swapFlex = () => {
-    if (
-      document.querySelector('.expenses-container').style.flexDirection ===
-      'row'
-    ) {
-      document.querySelector('.expenses-container').style.flexDirection =
-        'row-reverse';
+    if (document.querySelector('.expenses-div').style.order === '3') {
+      document.querySelector('.expenses-div').style.order = 1;
     } else {
-      document.querySelector('.expenses-container').style.flexDirection = 'row';
+      document.querySelector('.expenses-div').style.order = 3;
     }
   };
   return (
@@ -143,7 +141,16 @@ export default function Expenses() {
             </option>
           ))}
         </select>
-        <button onClick={swapFlex}>icon for reverse</button>
+        <button
+          style={{
+            alignSelf: 'flex-end',
+            padding: '0.39rem',
+            marginLeft: '0.5rem'
+          }}
+          onClick={swapFlex}
+        >
+          <i className="fa-solid fa-arrow-right-arrow-left fa-rotate-90"></i>
+        </button>
       </div>
       <div className="expenses-container">
         <div className="expenses-div">
@@ -197,14 +204,24 @@ export default function Expenses() {
               className="edit-btn primary-btn"
               onClick={() => setEditExpenses((prev) => !prev)}
             >
-              {editExpenses ? 'Cancel' : 'Edit mode'}
+              {editExpenses ? (
+                'Cancel'
+              ) : (
+                <>
+                  Edit mode{' '}
+                  <i
+                    style={{ color: '#696060' }}
+                    className="fa-solid fa-gear"
+                  ></i>
+                </>
+              )}
             </button>
           </div>
 
           {editExpenses ? (
             <>
               <form className="label-form" onSubmit={createLabelForExpenses}>
-                <button>create Label</button>
+                <button className="primary-btn">create Label</button>
                 {userInfo.expenses && userInfo.expenses.length && (
                   <CheckboxComponent
                     expenses={userInfo.expenses}
@@ -280,13 +297,23 @@ export default function Expenses() {
               className="edit-btn primary-btn"
               onClick={() => setEditIncomes((prev) => !prev)}
             >
-              {editIncomes ? 'Cancel' : 'Edit mode'}
+              {editIncomes ? (
+                'Cancel'
+              ) : (
+                <>
+                  Edit mode{' '}
+                  <i
+                    style={{ color: '#696060' }}
+                    className="fa-solid fa-gear"
+                  ></i>
+                </>
+              )}
             </button>
           </div>
           {editIncomes ? (
             <>
               <form className="label-form" onSubmit={createLabel}>
-                <button>create Label</button>
+                <button className="primary-btn">create Label</button>
                 {userInfo.expenses && userInfo.expenses.length && (
                   <CheckboxComponent
                     expenses={userInfo.expenses}

@@ -14,10 +14,10 @@ export default function CheckboxComponent(props) {
     expeseOrIncome && (
       <>
         {expeseOrIncome.map((expe, i) => (
-          <label key={i}>
+          <label className="check-item" key={i}>
             {expe.label && `${expe.label}:`}
             {expe.value}
-            <input type="checkbox" value={expe._id} />
+            <input className="myinput" type="checkbox" value={expe._id} />
           </label>
         ))}
       </>
